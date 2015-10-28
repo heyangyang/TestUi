@@ -5,18 +5,18 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.MouseEvent;
-	
+
 	import ui.SButton;
 	import ui.SList;
-	import ui.SScrollBar;
+	import ui.SScroller;
 	import ui.STextInput;
 	import ui.core.SViewControl;
-	
+
 	public class TestUi extends Sprite
 	{
 		private var list : SList;
 		private var array : Array;
-		
+
 		public function TestUi()
 		{
 			this.stage.align = StageAlign.TOP_LEFT;
@@ -44,16 +44,18 @@ package
 			button.setSKin(createShape(100, 30));
 			button.x = 200;
 			button.lable = "水电费GV";
-			
-			var scrollBar : SScrollBar = new SScrollBar(new TestSkin());
+
+			var scrollBar : SScroller = new SScroller(new TestScrollSkin());
 			addChild(scrollBar);
 			scrollBar.x = 400;
-			var shape : Sprite = new TestBg(200, 500);
+//			var shape : Sprite = new TestBg(200, 500);
+			var shape : Sprite = new TestBg1(500, 200);
+			scrollBar.horizontalScrollPolicy = SScroller.SCROLL_POLICY_ON;
 			scrollBar.setTarget(shape);
 			scrollBar.setSize(200, 200);
 			//stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
-		
+
 		private function createShape(w : int, h : int, color : int = 0xffffff) : Shape
 		{
 			var shape : Shape = new Shape();
@@ -62,9 +64,9 @@ package
 			shape.graphics.endFill();
 			return shape;
 		}
-		
+
 		private var label : STextInput;
-		
+
 		protected function onClick(event : MouseEvent) : void
 		{
 			label.password = !label.password;

@@ -3,14 +3,14 @@ package
 	import flash.display.Shape;
 	import flash.display.Sprite;
 
-	public class TestSkin extends Sprite
+	public class TestScrollSkin extends Sprite
 	{
 		public var btn_up : Shape;
 		public var btn_down : Shape;
 		public var btn_bar : Shape;
 		public var bg : Shape;
 
-		public function TestSkin()
+		public function TestScrollSkin()
 		{
 			bg = createShape(20, 20, 0x999999);
 			addChild(bg);
