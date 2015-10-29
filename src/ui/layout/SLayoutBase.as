@@ -41,7 +41,6 @@ package ui.layout
 		protected var mCurrScrollPercent : Number;
 
 		private var mLastStartIndex : int = -1;
-		protected var mPoint : Point = new Point();
 		private var mLastDataLength : int;
 		private var mLastDataProvider : *;
 
@@ -56,9 +55,23 @@ package ui.layout
 			updateSize();
 		}
 
-		public function sort(items : Vector.<SListRender>, dataProvider : *) : Point
+		/**
+		 * 设置滚动位置，取值0-1
+		 * @param value
+		 *
+		 */
+		public function setScrollPercent(value : Number) : void
 		{
-			return null;
+			mCurrScrollPercent = value;
+		}
+
+		public function getScrollPercent() : Number
+		{
+			return mCurrScrollPercent;
+		}
+
+		public function sort(items : Vector.<SListRender>, dataProvider : *) : void
+		{
 		}
 
 		protected function update(items : Vector.<SListRender>, dataProvider : *, row : int, col : int, size : int) : void
@@ -173,16 +186,31 @@ package ui.layout
 			updateSize();
 		}
 
+		public function get gap() : int
+		{
+			return mGap;
+		}
+
 		public function set itemWidth(value : int) : void
 		{
 			mItemWidth = value;
 			updateSize();
 		}
 
+		public function get itemWidth() : int
+		{
+			return mItemWidth;
+		}
+
 		public function set itemHeight(value : int) : void
 		{
 			mItemHeight = value;
 			updateSize();
+		}
+
+		public function get itemHeight() : int
+		{
+			return mItemHeight;
 		}
 
 		/**

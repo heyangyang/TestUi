@@ -39,15 +39,15 @@ package ui
 		 */
 		private var mLastDragPosition : int;
 		private var whellDelta : int = 10;
-		private var mVerticalScrollPolicy : String = SCROLL_POLICY_ON;
-		private var mHorizontalScrollPolicy : String = SCROLL_POLICY_OFF;
+		protected var mVerticalScrollPolicy : String = SCROLL_POLICY_ON;
+		protected var mHorizontalScrollPolicy : String = SCROLL_POLICY_OFF;
 		private var mDragRectangle : Rectangle;
 
 		public function SScroller(skin : DisplayObject = null)
 		{
-			super(skin);
 			this.mask = mMask;
 			addChildAt(mMask, 0);
+			super(skin);
 		}
 
 		override public function setSKin(value : DisplayObject) : void
@@ -76,6 +76,8 @@ package ui
 
 		override protected function addListenerHandler() : void
 		{
+			if (!mSkin)
+				return;
 			addViewListener(mScrollBtn, MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 			addViewListener(stage, MouseEvent.MOUSE_UP, onMouseUpHandler);
 			addViewListener(this, MouseEvent.ROLL_OVER, onRollOverHandler);
@@ -144,28 +146,15 @@ package ui
 		 */
 		public function setScrollPercent(value : Number) : void
 		{
+			if (mCurrScrollPercent == value)
+				return;
 			mCurrScrollPercent = value;
 			validate();
 		}
 
-		/**
-		 * 目标文件宽高有改变
-		 *
-		 */
-		private function targetChangeHandler(evt : Event = null) : void
+		protected function get targetSize() : int
 		{
-			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
-			{
-				mMaxScroll = Math.min(0, mHeight - mTarget.height);
-				mScrollBtn.height = mMaxScroll / mMaxBarScroll;
-			}
-			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
-			{
-				mMaxScroll = Math.min(0, mWidth - mTarget.width);
-				mScrollBtn.width = mMaxScroll / mMaxBarScroll;
-			}
-			mScrollBtn.visible = mMaxScroll != 0;
-			invalidate();
+			return mVerticalScrollPolicy == SCROLL_POLICY_ON ? mTarget.height : mTarget.width;
 		}
 
 		override protected function validate() : void
@@ -176,22 +165,7 @@ package ui
 			{
 				mResize = false;
 				targetChangeHandler();
-				if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
-				{
-					mBgImage.height = mHeight;
-					mSkin.x = mWidth - mSkin.width;
-					mDownBtn.y = mHeight - mDownBtn.height;
-					mMaxBarScroll = mHeight - mUpBtn.height * 2 - mScrollBtn.height;
-					mDragRectangle = new Rectangle(0, mUpBtn.height, 0, mMaxBarScroll);
-				}
-				else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
-				{
-					mBgImage.width = mWidth;
-					mSkin.y = mHeight - mSkin.height;
-					mDownBtn.x = mWidth - mDownBtn.width;
-					mMaxBarScroll = mWidth - mUpBtn.width * 2 - mScrollBtn.width;
-					mDragRectangle = new Rectangle(mUpBtn.width, 0, mMaxBarScroll, 0);
-				}
+				updateBtn();
 				updateMask();
 			}
 			mCurrScrollPercent = Math.max(0, mCurrScrollPercent);
@@ -205,6 +179,46 @@ package ui
 			{
 				mTarget.x = mCurrScrollPercent * mMaxScroll;
 				mScrollBtn.x = mUpBtn.width + mMaxBarScroll * mCurrScrollPercent;
+			}
+		}
+
+		/**
+		 * 目标文件宽高有改变
+		 *
+		 */
+		private function targetChangeHandler(evt : Event = null) : void
+		{
+			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mMaxScroll = Math.min(0, mHeight - targetSize);
+				mScrollBtn.height = Math.max(10, mMaxScroll / mHeight);
+			}
+			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mMaxScroll = Math.min(0, mWidth - targetSize);
+				mScrollBtn.width = Math.max(10, mMaxScroll / mWidth);
+			}
+			mScrollBtn.visible = mMaxScroll != 0;
+			evt && invalidate();
+		}
+
+		protected function updateBtn() : void
+		{
+			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mBgImage.height = mHeight;
+				mSkin.x = mWidth - mSkin.width;
+				mDownBtn.y = mHeight - mDownBtn.height;
+				mMaxBarScroll = mHeight - mUpBtn.height * 2 - mScrollBtn.height;
+				mDragRectangle = new Rectangle(0, mUpBtn.height, 0, mMaxBarScroll);
+			}
+			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mBgImage.width = mWidth;
+				mSkin.y = mHeight - mSkin.height;
+				mDownBtn.x = mWidth - mDownBtn.width;
+				mMaxBarScroll = mWidth - mUpBtn.width * 2 - mScrollBtn.width;
+				mDragRectangle = new Rectangle(mUpBtn.width, 0, mMaxBarScroll, 0);
 			}
 		}
 

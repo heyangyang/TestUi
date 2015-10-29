@@ -1,6 +1,5 @@
 package ui.layout
 {
-	import flash.geom.Point;
 	import ui.SListRender;
 
 	/**
@@ -14,11 +13,9 @@ package ui.layout
 		{
 		}
 
-		override public function sort(items : Vector.<SListRender>, dataProvider : *) : Point
+		override public function sort(items : Vector.<SListRender>, dataProvider : *) : void
 		{
 			update(items, dataProvider, mTotalRows, mTotalCols, mItemWidth);
-			mPoint.x = mScrollPosition;
-			return mPoint;
 		}
 
 		override public function sortRender(render : SListRender, index : int) : void

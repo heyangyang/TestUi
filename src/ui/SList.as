@@ -1,15 +1,12 @@
 package ui
 {
-	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	import flash.geom.Point;
-	
-	import ui.base.SComponets;
+
 	import ui.layout.SLayoutBase;
 	import ui.layout.SVerticalLayout;
 
-	public class SList extends SComponets
+	public class SList extends SScroller
 	{
 		private static function sDefauleRender() : SListRender
 		{
@@ -19,7 +16,6 @@ package ui
 		private var mDefaultRender : Function = sDefauleRender;
 		private var mList : Vector.<SListRender> = new Vector.<SListRender>();
 		private var mContainer : Sprite = new Sprite();
-		private var mMask : Shape = new Shape();
 		/**
 		 * 源数据
 		 */
@@ -38,52 +34,15 @@ package ui
 
 		private var mCurrScrollIndex : int = -1;
 
+		private var mTargetSize : int;
+
 		public function SList()
 		{
 		}
 
 		override protected function init() : void
 		{
-			addChild(mContainer);
-			addChild(mMask);
-			mContainer.mask = mMask;
-		}
-
-		override protected function addListenerHandler() : void
-		{
-			addViewListener(this, MouseEvent.ROLL_OVER, onRollOverHandler);
-			addViewListener(this, MouseEvent.ROLL_OUT, onRollOutHandler);
-		}
-
-		private function onRollOverHandler(evt : MouseEvent) : void
-		{
-			stage.focus = stage;
-			addViewListener(stage, MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
-		}
-
-		private function onRollOutHandler(evt : MouseEvent) : void
-		{
-			removeViewListener(stage, MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
-		}
-
-		protected function onMouseWheelHandler(event : MouseEvent) : void
-		{
-			mLayout.scrollPosition += event.delta * 2;
-			invalidate();
-		}
-
-		/**
-		 * 设置大小
-		 * @param w
-		 * @param h
-		 *
-		 */
-		override public function setSize(w : int, h : int) : void
-		{
-			mWidth = w;
-			mHeight = h;
-			mResize = true;
-			invalidate();
+			setTarget(mContainer);
 		}
 
 		/**
@@ -127,19 +86,22 @@ package ui
 		{
 			if (mLayout == null)
 				layout = new SVerticalLayout();
-			if (mCurrScrollIndex != -1)
-			{
-				layout.scrollItemIndex(mCurrScrollIndex);
-				mCurrScrollIndex = -1;
-			}
 			if (mResize)
 			{
-				mResize = false;
-				updateMask();
 				var render : SListRender = mDefaultRender();
-				mLayout.setSize(mWidth, mHeight);
 				mLayout.itemWidth = render.width;
 				mLayout.itemHeight = render.height;
+
+				if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
+				{
+					mLayout.setSize(mWidth - (mSkin ? mSkin.width : 0), mHeight);
+					mTargetSize = mLayout.itemHeight * Math.ceil(mDataProvider.length / mLayout.totalCols) - mLayout.gap;
+				}
+				else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
+				{
+					mLayout.setSize(mWidth, mHeight -(mSkin ? mSkin.height : 0));
+					mTargetSize = mLayout.itemWidth * Math.ceil(mDataProvider.length / mLayout.totalRows) - mLayout.gap;
+				}
 
 				var len : int = mLayout.showItemNum + mLayout.differenceValue * 2;
 				for (var i : int = 0; i < len; i++)
@@ -157,9 +119,28 @@ package ui
 					render.dispose();
 				}
 			}
-			var point : Point = mLayout.sort(mList, mDataProvider);
-			mContainer.x = point.x + mPaddingLeft;
-			mContainer.y = point.y + mPaddingTop;
+			super.validate();
+			layout.scrollItemIndex(mCurrScrollIndex);
+			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mLayout.scrollPosition = mContainer.y;
+			}
+			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
+			{
+				mLayout.scrollPosition = mContainer.x;
+			}
+			mLayout.sort(mList, mDataProvider);
+			if (mCurrScrollIndex != -1)
+			{
+				mCurrScrollPercent = mLayout.getScrollPercent();
+				super.validate();
+				mCurrScrollIndex = -1;
+			}
+		}
+
+		override protected function get targetSize() : int
+		{
+			return mTargetSize;
 		}
 
 		protected function onItemClick(event : MouseEvent) : void
@@ -168,17 +149,6 @@ package ui
 				mSelectedItem.isSelected = false;
 			mSelectedItem = event.currentTarget as SListRender;
 			mSelectedItem.isSelected = true;
-		}
-
-		private function updateMask() : void
-		{
-			mMask.graphics.beginFill(0, 0.1);
-			mMask.graphics.drawRect(0, 0, mWidth, mHeight);
-			mMask.graphics.endFill();
-
-			graphics.beginFill(0, 0);
-			graphics.drawRect(0, 0, mWidth, mHeight);
-			graphics.endFill();
 		}
 
 		public function set layout(value : SLayoutBase) : void

@@ -37,11 +37,18 @@ package ui.base
 			SViewControl.getInstance().addControl(this);
 		}
 
+		/**
+		 * 设置大小
+		 * @param w
+		 * @param h
+		 *
+		 */
 		public function setSize(w : int, h : int) : void
 		{
 			mResize = true;
 			mWidth = w;
 			mHeight = h;
+			invalidate();
 		}
 
 		self function onEnterFrame() : void

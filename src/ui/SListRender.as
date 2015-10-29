@@ -1,7 +1,7 @@
 package ui
 {
 	import flash.text.TextField;
-	
+
 	import ui.base.ViewBase;
 	import ui.namespaces.self;
 
@@ -17,6 +17,8 @@ package ui
 			mTxt = new TextField();
 			mTxt.width = 100;
 			mTxt.height = 25;
+			mTxt.background = true;
+			mTxt.border=true;
 			mTxt.selectable = false;
 			addChild(mTxt);
 		}

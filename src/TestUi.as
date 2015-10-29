@@ -5,12 +5,13 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.MouseEvent;
-
+	
 	import ui.SButton;
 	import ui.SList;
 	import ui.SScroller;
 	import ui.STextInput;
 	import ui.core.SViewControl;
+	import ui.layout.SHorizontalLayout;
 
 	public class TestUi extends Sprite
 	{
@@ -24,15 +25,16 @@ package
 			SViewControl.getInstance().init(stage);
 			list = new SList();
 			list.setSize(200, 200);
-			addChild(list);
 			array = [];
 			for (var i : int = 0; i < 500; i++)
 			{
 				array.push(i + "," + int(Math.random() * 10000000));
 			}
-			//			list.layout = new SHorizontalLayout();
+//			list.layout = new SHorizontalLayout();
+//			list.horizontalScrollPolicy = SScroller.SCROLL_POLICY_ON;
+			list.setSKin(new TestScrollSkin());
 			list.layout.gap = 20;
-			list.scrollItemIndex(0)
+//			list.scrollItemIndex(90)
 			list.dataProvider = array;
 			list.x = list.y = 150;
 			label = new STextInput();
@@ -41,18 +43,19 @@ package
 			label.text = "电风扇水电费";
 			var button : SButton = new SButton();
 			addChild(button);
+			addChild(list);
 			button.setSKin(createShape(100, 30));
 			button.x = 200;
 			button.lable = "水电费GV";
 
-			var scrollBar : SScroller = new SScroller(new TestScrollSkin());
-			addChild(scrollBar);
-			scrollBar.x = 400;
-//			var shape : Sprite = new TestBg(200, 500);
-			var shape : Sprite = new TestBg1(500, 200);
-			scrollBar.horizontalScrollPolicy = SScroller.SCROLL_POLICY_ON;
-			scrollBar.setTarget(shape);
-			scrollBar.setSize(200, 200);
+//			var scrollBar : SScroller = new SScroller(new TestScrollSkin());
+//			addChild(scrollBar);
+//			scrollBar.x = 400;
+////			var shape : Sprite = new TestBg(200, 500);
+//			var shape : Sprite = new TestBg1(500, 200);
+//			scrollBar.horizontalScrollPolicy = SScroller.SCROLL_POLICY_ON;
+//			scrollBar.setTarget(shape);
+//			scrollBar.setSize(200, 200);
 			//stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 
