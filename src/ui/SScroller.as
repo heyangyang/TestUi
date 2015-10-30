@@ -19,6 +19,10 @@ package ui
 		public static const SCROLL_POLICY_ON : String = "on";
 		public static const SCROLL_POLICY_OFF : String = "off";
 		public static const CHANGE : String = "scroll_change";
+		/**
+		 * 按钮的大小
+		 */
+		private var mBtnSize : int;
 		private var mUpBtn : SButton;
 		private var mDownBtn : SButton;
 		private var mScrollBtn : SButton;
@@ -56,10 +60,18 @@ package ui
 				return;
 			super.setSKin(value);
 			var skin : Sprite = mSkin as Sprite;
-			mUpBtn = new SButton(value["btn_up"]);
-			skin.addChild(mUpBtn);
-			mDownBtn = new SButton(value["btn_down"]);
-			skin.addChild(mDownBtn);
+
+			if (value["btn_down"])
+			{
+				mUpBtn = new SButton(value["btn_up"]);
+				skin.addChild(mUpBtn);
+				mDownBtn = new SButton(value["btn_down"]);
+				skin.addChild(mDownBtn);
+
+				if (mUpBtn.width == mUpBtn.height)
+					mBtnSize = mUpBtn.width;
+			}
+
 			mScrollBtn = new SButton(value["btn_bar"]);
 			skin.addChild(mScrollBtn);
 			mBgImage = value["bg"];
@@ -83,6 +95,18 @@ package ui
 			addViewListener(this, MouseEvent.ROLL_OVER, onRollOverHandler);
 			addViewListener(this, MouseEvent.ROLL_OUT, onRollOutHandler);
 			addViewListener(mTarget, CHANGE, targetChangeHandler);
+			addViewListener(mDownBtn, MouseEvent.CLICK, onScrollDownHandler);
+			addViewListener(mUpBtn, MouseEvent.CLICK, onScrollUpHandler);
+		}
+
+		private function onScrollUpHandler(evt : Event) : void
+		{
+			setTargetPosition(mVerticalScrollPolicy == SCROLL_POLICY_ON ? mTarget.y + mHeight : mTarget.x + mWidth, 1);
+		}
+
+		private function onScrollDownHandler(evt : Event) : void
+		{
+			setTargetPosition(mVerticalScrollPolicy == SCROLL_POLICY_ON ? mTarget.y - mHeight : mTarget.x - mWidth, -1);
 		}
 
 		override protected function hide() : void
@@ -120,23 +144,25 @@ package ui
 				if (mScrollBtn.y == mLastDragPosition)
 					return;
 				mLastDragPosition = mScrollBtn.y;
-				setScrollPercent((mScrollBtn.y - mUpBtn.height) / mMaxBarScroll);
+				setScrollPercent((mScrollBtn.y - mBtnSize) / mMaxBarScroll);
 			}
 			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
 			{
 				if (mScrollBtn.x == mLastDragPosition)
 					return;
 				mLastDragPosition = mScrollBtn.x;
-				setScrollPercent((mScrollBtn.x - mUpBtn.width) / mMaxBarScroll);
+				setScrollPercent((mScrollBtn.x - mBtnSize) / mMaxBarScroll);
 			}
 		}
 
 		protected function onMouseWheelHandler(event : MouseEvent) : void
 		{
-			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
-				setScrollPercent((mTarget.y + event.delta / 3 * whellDelta) / mMaxScroll);
-			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
-				setScrollPercent((mTarget.x + event.delta / 3 * whellDelta) / mMaxScroll);
+			setTargetPosition(mVerticalScrollPolicy == SCROLL_POLICY_ON ? mTarget.y : mTarget.x, event.delta > 0 ? 1 : -1);
+		}
+
+		private function setTargetPosition(position : Number, dir : int) : void
+		{
+			setScrollPercent((position + dir * whellDelta) / mMaxScroll);
 		}
 
 		/**
@@ -173,12 +199,12 @@ package ui
 			if (mVerticalScrollPolicy == SCROLL_POLICY_ON)
 			{
 				mTarget.y = mCurrScrollPercent * mMaxScroll;
-				mScrollBtn.y = mUpBtn.height + mMaxBarScroll * mCurrScrollPercent;
+				mScrollBtn.y = mBtnSize + mMaxBarScroll * mCurrScrollPercent;
 			}
 			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
 			{
 				mTarget.x = mCurrScrollPercent * mMaxScroll;
-				mScrollBtn.x = mUpBtn.width + mMaxBarScroll * mCurrScrollPercent;
+				mScrollBtn.x = mBtnSize + mMaxBarScroll * mCurrScrollPercent;
 			}
 		}
 
@@ -208,17 +234,19 @@ package ui
 			{
 				mBgImage.height = mHeight;
 				mSkin.x = mWidth - mSkin.width;
-				mDownBtn.y = mHeight - mDownBtn.height;
-				mMaxBarScroll = mHeight - mUpBtn.height * 2 - mScrollBtn.height;
-				mDragRectangle = new Rectangle(0, mUpBtn.height, 0, mMaxBarScroll);
+				if (mDownBtn)
+					mDownBtn.y = mHeight - mBtnSize;
+				mMaxBarScroll = mHeight - mBtnSize * 2 - mScrollBtn.height;
+				mDragRectangle = new Rectangle(0, mBtnSize, 0, mMaxBarScroll);
 			}
 			else if (mHorizontalScrollPolicy == SCROLL_POLICY_ON)
 			{
 				mBgImage.width = mWidth;
 				mSkin.y = mHeight - mSkin.height;
-				mDownBtn.x = mWidth - mDownBtn.width;
-				mMaxBarScroll = mWidth - mUpBtn.width * 2 - mScrollBtn.width;
-				mDragRectangle = new Rectangle(mUpBtn.width, 0, mMaxBarScroll, 0);
+				if (mDownBtn)
+					mDownBtn.x = mWidth - mBtnSize;
+				mMaxBarScroll = mWidth - mBtnSize * 2 - mScrollBtn.width;
+				mDragRectangle = new Rectangle(mBtnSize, 0, mMaxBarScroll, 0);
 			}
 		}
 
