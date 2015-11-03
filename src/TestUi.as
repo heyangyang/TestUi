@@ -5,7 +5,7 @@ package
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.MouseEvent;
-	
+
 	import ui.SButton;
 	import ui.SList;
 	import ui.SScroller;
@@ -51,12 +51,12 @@ package
 //			var scrollBar : SScroller = new SScroller(new TestScrollSkin());
 //			addChild(scrollBar);
 //			scrollBar.x = 400;
-////			var shape : Sprite = new TestBg(200, 500);
+//			var shape : Sprite = new TestBg(200, 500);
 //			var shape : Sprite = new TestBg1(500, 200);
 //			scrollBar.horizontalScrollPolicy = SScroller.SCROLL_POLICY_ON;
 //			scrollBar.setTarget(shape);
 //			scrollBar.setSize(200, 200);
-			//stage.addEventListener(MouseEvent.CLICK, onClick);
+//			stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 
 		private function createShape(w : int, h : int, color : int = 0xffffff) : Shape
